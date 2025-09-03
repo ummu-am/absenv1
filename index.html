@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Absensi Online Guru - SMP Negeri 3 Lempuing Jaya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-shadow { box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .btn-primary { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+        .btn-primary:hover { background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%); }
+        .admin-tab { display: none; }
+        .admin-tab.active { display: block; }
+        .logo-preview { max-width: 200px; max-height: 200px; object-fit: contain; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-4 shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-center space-x-4">
+                <!-- Logo Sekolah -->
+                <div id="headerLogo" class="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                    <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                    </svg>
+                </div>
+                <h1 id="headerNamaSekolah" class="text-xl md:text-2xl font-bold">SMP NEGERI 3 LEMPUING JAYA</h1>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Navigation Menu -->
+        <div class="bg-white rounded-lg card-shadow mb-8 p-6">
+            <div class="flex flex-wrap gap-4 justify-center">
+                <button onclick="showSection('dashboard')" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105">
+                    🏠 Dashboard
+                </button>
+                <button onclick="showSection('absensi')" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105">
+                    ✅ Absensi Guru
+                </button>
+                <button onclick="showSection('rekap')" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105">
+                    📊 Rekap Bulanan
+                </button>
+                <button onclick="showSection('admin')" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105">
+                    👨‍💼 Login Admin
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="section">
+            <!-- School Info Header -->
+            <div class="bg-white rounded-lg card-shadow p-8 mb-8 text-center">
+                <!-- Logo Sekolah Besar -->
+                <div id="dashboardLogo" class="w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                    <svg class="w-20 h-20 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                    </svg>
+                </div>
+                
+                <!-- Informasi Sekolah -->
+                <h1 id="dashboardNamaSekolah" class="text-3xl md:text-4xl font-bold text-gray-800 mb-3">SMP NEGERI 3 LEMPUING JAYA</h1>
+                <p id="dashboardAlamatSekolah" class="text-lg text-gray-600 mb-2">Jln. Flamboyan, Desa Tania Makmur, Kec. Lempuing Jaya, OKI</p>
+                <div class="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-full font-semibold text-lg shadow-lg">
+                    📚 SISTEM ABSENSI ONLINE GURU
+                </div>
+                
+                <!-- Waktu Real-time -->
+                <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                    <div id="currentDateTime" class="text-xl font-semibold text-gray-800"></div>
+                    <p class="text-gray-600">Waktu Indonesia Barat (WIB)</p>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                    <div class="text-4xl mb-4">👥</div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Total Guru</h3>
+                    <p class="text-3xl font-bold text-blue-600" id="totalGuru">0</p>
+                </div>
+                <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                    <div class="text-4xl mb-4">✅</div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Hadir Hari Ini</h3>
+                    <p class="text-3xl font-bold text-green-600" id="hadirHariIni">0</p>
+                </div>
+                <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                    <div class="text-4xl mb-4">📋</div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Izin Hari Ini</h3>
+                    <p class="text-3xl font-bold text-yellow-600" id="izinHariIni">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Absensi Section -->
+        <div id="absensi" class="section hidden">
+            <div class="bg-white rounded-lg card-shadow p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">📝 Absensi Guru</h2>
+                
+                <div class="max-w-md mx-auto">
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-semibold mb-2">Pilih Guru:</label>
+                        <select id="guruSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">-- Pilih Guru --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-semibold mb-2">Jenis Absensi:</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button onclick="selectAbsensiType('kedatangan')" id="btnKedatangan" class="p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors">
+                                🌅 Kedatangan
+                            </button>
+                            <button onclick="selectAbsensiType('pulang')" id="btnPulang" class="p-3 border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors">
+                                🌆 Pulang
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-semibold mb-2">Status Kehadiran:</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button onclick="selectStatus('hadir')" id="btnHadir" class="p-3 border-2 border-gray-300 rounded-lg hover:border-green-500 transition-colors">
+                                ✅ Hadir
+                            </button>
+                            <button onclick="selectStatus('izin')" id="btnIzin" class="p-3 border-2 border-gray-300 rounded-lg hover:border-yellow-500 transition-colors">
+                                📋 Izin
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="keteranganDiv" class="mb-6 hidden">
+                        <label class="block text-gray-700 font-semibold mb-2">Keterangan Izin:</label>
+                        <textarea id="keterangan" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3" placeholder="Masukkan keterangan izin..."></textarea>
+                    </div>
+
+                    <button onclick="submitAbsensi()" class="w-full btn-primary text-white py-3 rounded-lg font-semibold hover:scale-105 transition-all duration-300">
+                        💾 Simpan Absensi
+                    </button>
+                </div>
+
+                <div id="absensiMessage" class="mt-6 text-center hidden"></div>
+            </div>
+        </div>
+
+        <!-- Rekap Section -->
+        <div id="rekap" class="section hidden">
+            <div class="bg-white rounded-lg card-shadow p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">📊 Rekap Absensi Bulanan</h2>
+                
+                <!-- Filter Controls -->
+                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                    <div class="flex flex-wrap gap-4 justify-center items-center">
+                        <div class="flex items-center gap-2">
+                            <label class="font-semibold text-gray-700">Periode:</label>
+                            <select id="bulanSelect" class="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="0">Januari</option>
+                                <option value="1">Februari</option>
+                                <option value="2">Maret</option>
+                                <option value="3">April</option>
+                                <option value="4">Mei</option>
+                                <option value="5">Juni</option>
+                                <option value="6">Juli</option>
+                                <option value="7">Agustus</option>
+                                <option value="8">September</option>
+                                <option value="9">Oktober</option>
+                                <option value="10">November</option>
+                                <option value="11">Desember</option>
+                            </select>
+                            <select id="tahunSelect" class="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <label class="font-semibold text-gray-700">Guru:</label>
+                            <select id="guruRekapSelect" class="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="">Semua Guru</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <label class="font-semibold text-gray-700">Sortir:</label>
+                            <select id="sortSelect" class="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="tanggal-desc">Tanggal Terbaru</option>
+                                <option value="tanggal-asc">Tanggal Terlama</option>
+                                <option value="nama-asc">Nama A-Z</option>
+                                <option value="nama-desc">Nama Z-A</option>
+                                <option value="status-hadir">Status Hadir</option>
+                                <option value="status-izin">Status Izin</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2 justify-center mt-4">
+                        <button onclick="loadRekap()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold">
+                            🔍 Tampilkan Rekap
+                        </button>
+                        <button onclick="loadIndividualRekap()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold">
+                            👤 Rekap Individu
+                        </button>
+                        <button onclick="downloadExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold">
+                            📥 Download Excel
+                        </button>
+                        <button onclick="showGoogleSheetsModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold">
+                            📊 Sync ke Google Sheets
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recap Header -->
+                <div id="rekapHeader" class="text-center mb-6 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">📋 Absensi Guru <span id="rekapNamaSekolah">SMP Negeri 3 Lempuing Jaya</span></h3>
+                    <div class="flex justify-center gap-8 text-lg mb-4">
+                        <div class="flex items-center">
+                            <span class="font-semibold text-blue-700">Bulan:</span>
+                            <span id="displayBulan" class="ml-2 font-bold text-blue-900">-</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="font-semibold text-purple-700">Tahun:</span>
+                            <span id="displayTahun" class="ml-2 font-bold text-purple-900">-</span>
+                        </div>
+                    </div>
+                    <div id="individualStats" class="hidden">
+                        <div class="text-lg font-semibold text-gray-800 mb-2">
+                            Rekap Individu: <span id="selectedGuruName" class="text-indigo-700"></span>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                            <div class="bg-green-100 p-3 rounded-lg">
+                                <div class="font-semibold text-green-800">Total Hadir</div>
+                                <div id="totalHadir" class="text-2xl font-bold text-green-600">0</div>
+                            </div>
+                            <div class="bg-yellow-100 p-3 rounded-lg">
+                                <div class="font-semibold text-yellow-800">Total Izin</div>
+                                <div id="totalIzin" class="text-2xl font-bold text-yellow-600">0</div>
+                            </div>
+                            <div class="bg-red-100 p-3 rounded-lg">
+                                <div class="font-semibold text-red-800">Tidak Hadir</div>
+                                <div id="totalTidakHadir" class="text-2xl font-bold text-red-600">0</div>
+                            </div>
+                            <div class="bg-blue-100 p-3 rounded-lg">
+                                <div class="font-semibold text-blue-800">Persentase Kehadiran</div>
+                                <div id="persentaseKehadiran" class="text-2xl font-bold text-blue-600">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table id="rekapTable" class="w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 p-2">Tanggal</th>
+                                <th class="border border-gray-300 p-2">Nama Guru</th>
+                                <th class="border border-gray-300 p-2">Kedatangan</th>
+                                <th class="border border-gray-300 p-2">Status Datang</th>
+                                <th class="border border-gray-300 p-2">Pulang</th>
+                                <th class="border border-gray-300 p-2">Status Pulang</th>
+                                <th class="border border-gray-300 p-2">Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rekapTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Section -->
+        <div id="admin" class="section hidden">
+            <div class="bg-white rounded-lg card-shadow p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">👨‍💼 Panel Admin</h2>
+                
+                <div id="loginForm" class="max-w-md mx-auto">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-semibold mb-2">Username:</label>
+                        <input type="text" id="adminUsername" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Masukkan username">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-semibold mb-2">Password:</label>
+                        <input type="password" id="adminPassword" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Masukkan password">
+                    </div>
+                    <button onclick="adminLogin()" class="w-full btn-primary text-white py-3 rounded-lg font-semibold">
+                        🔐 Login
+                    </button>
+                    <div id="loginMessage" class="mt-4 text-center hidden"></div>
+                </div>
+
+                <div id="adminPanel" class="hidden">
+                    <!-- Admin Menu Tabs -->
+                    <div class="flex flex-wrap gap-2 mb-6 border-b">
+                        <button onclick="showAdminTab('guru')" id="tabGuru" class="px-4 py-2 font-semibold border-b-2 border-blue-600 text-blue-600">
+                            👥 Data Guru
+                        </button>
+                        <button onclick="showAdminTab('sekolah')" id="tabSekolah" class="px-4 py-2 font-semibold border-b-2 border-transparent text-gray-600 hover:text-blue-600">
+                            🏫 Pengaturan Sekolah
+                        </button>
+                    </div>
+
+                    <!-- Data Guru Tab -->
+                    <div id="adminGuruTab" class="admin-tab active">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-semibold">Data Guru</h3>
+                            <button onclick="showAddGuruForm()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+                                ➕ Tambah Guru
+                            </button>
+                        </div>
+
+                        <div id="addGuruForm" class="hidden mb-6 p-4 bg-gray-50 rounded-lg">
+                            <h4 class="font-semibold mb-4">Tambah Data Guru Baru</h4>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <input type="text" id="nipGuru" placeholder="NIP" class="p-3 border border-gray-300 rounded-lg">
+                                <input type="text" id="namaGuru" placeholder="Nama Guru" class="p-3 border border-gray-300 rounded-lg">
+                                <input type="email" id="emailGuru" placeholder="Email Belajar" class="p-3 border border-gray-300 rounded-lg">
+                                <input type="text" id="noHpGuru" placeholder="No Handphone" class="p-3 border border-gray-300 rounded-lg">
+                                <input type="text" id="alamatGuru" placeholder="Alamat" class="p-3 border border-gray-300 rounded-lg md:col-span-1">
+                                <input type="text" id="mataPelajaran" placeholder="Mata Pelajaran" class="p-3 border border-gray-300 rounded-lg">
+                            </div>
+                            <div class="mt-4 flex gap-2">
+                                <button onclick="saveGuru()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                                    💾 Simpan
+                                </button>
+                                <button onclick="cancelAddGuru()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
+                                    ❌ Batal
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full border-collapse border border-gray-300">
+                                <thead>
+                                    <tr class="bg-gray-100">
+                                        <th class="border border-gray-300 p-2">NIP</th>
+                                        <th class="border border-gray-300 p-2">Nama</th>
+                                        <th class="border border-gray-300 p-2">Email</th>
+                                        <th class="border border-gray-300 p-2">No HP</th>
+                                        <th class="border border-gray-300 p-2">Mata Pelajaran</th>
+                                        <th class="border border-gray-300 p-2">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="guruTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Pengaturan Sekolah Tab -->
+                    <div id="adminSekolahTab" class="admin-tab">
+                        <h3 class="text-xl font-semibold mb-6">🏫 Pengaturan Sekolah</h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <!-- Form Pengaturan -->
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">Nama Sekolah:</label>
+                                    <input type="text" id="namaSekolahSetting" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Masukkan nama sekolah">
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">Alamat Sekolah:</label>
+                                    <textarea id="alamatSekolahSetting" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3" placeholder="Masukkan alamat lengkap sekolah"></textarea>
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">Upload Logo Sekolah (JPG):</label>
+                                    <input type="file" id="logoSekolahFile" accept=".jpg,.jpeg" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <p class="text-sm text-gray-500 mt-1">Format yang didukung: JPG/JPEG, maksimal 2MB</p>
+                                </div>
+
+                                <div class="flex gap-4">
+                                    <button onclick="saveSekolahSettings()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold">
+                                        💾 Simpan Pengaturan
+                                    </button>
+                                    <button onclick="resetSekolahSettings()" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold">
+                                        🔄 Reset ke Default
+                                    </button>
+                                </div>
+
+                                <div id="sekolahMessage" class="hidden"></div>
+                            </div>
+
+                            <!-- Preview -->
+                            <div class="space-y-6">
+                                <div class="bg-gray-50 p-6 rounded-lg">
+                                    <h4 class="font-semibold mb-4 text-center">👁️ Preview Logo</h4>
+                                    <div class="text-center">
+                                        <div id="logoPreviewContainer" class="w-48 h-48 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                                            <svg class="w-24 h-24 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                                            </svg>
+                                        </div>
+                                        <p class="text-sm text-gray-600">Logo akan tampil di sini</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-blue-50 p-6 rounded-lg">
+                                    <h4 class="font-semibold mb-4 text-center">📋 Informasi Saat Ini</h4>
+                                    <div class="space-y-3 text-sm">
+                                        <div>
+                                            <span class="font-semibold text-gray-700">Nama Sekolah:</span>
+                                            <p id="currentNamaSekolah" class="text-gray-600 mt-1">SMP Negeri 3 Lempuing Jaya</p>
+                                        </div>
+                                        <div>
+                                            <span class="font-semibold text-gray-700">Alamat:</span>
+                                            <p id="currentAlamatSekolah" class="text-gray-600 mt-1">Jln. Flamboyan, Desa Tania Makmur, Kec. Lempuing Jaya, OKI</p>
+                                        </div>
+                                        <div>
+                                            <span class="font-semibold text-gray-700">Status Logo:</span>
+                                            <p id="currentLogoStatus" class="text-gray-600 mt-1">Logo Default (SVG)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 text-center">
+                        <button onclick="adminLogout()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg">
+                            🚪 Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Google Sheets Modal -->
+    <div id="googleSheetsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+            <h3 class="text-xl font-bold mb-4">📊 Integrasi Google Sheets</h3>
+            
+            <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+                <h4 class="font-semibold text-blue-800 mb-2">📋 Langkah-langkah Setup:</h4>
+                <ol class="list-decimal list-inside text-sm text-blue-700 space-y-1">
+                    <li>Buka <a href="https://script.google.com" target="_blank" class="underline">Google Apps Script</a></li>
+                    <li>Buat project baru dan paste kode yang disediakan</li>
+                    <li>Deploy sebagai Web App dengan akses "Anyone"</li>
+                    <li>Copy URL deployment dan paste di bawah</li>
+                    <li>Buat Google Sheet baru untuk menyimpan data absensi</li>
+                </ol>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2">Google Apps Script URL:</label>
+                <input type="url" id="googleScriptUrl" class="w-full p-3 border border-gray-300 rounded-lg" 
+                       placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2">Google Sheet ID:</label>
+                <input type="text" id="googleSheetId" class="w-full p-3 border border-gray-300 rounded-lg" 
+                       placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms">
+                <p class="text-xs text-gray-500 mt-1">ID Sheet bisa ditemukan di URL Google Sheets</p>
+            </div>
+
+            <div class="mb-6">
+                <button onclick="testGoogleSheetsConnection()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg mr-2">
+                    🔗 Test Koneksi
+                </button>
+                <button onclick="syncToGoogleSheets()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+                    📤 Sync Data
+                </button>
+            </div>
+
+            <div id="googleSheetsStatus" class="mb-4 hidden"></div>
+
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="font-semibold mb-2">📝 Kode Google Apps Script:</h4>
+                <textarea readonly class="w-full h-32 p-2 text-xs bg-gray-100 border rounded" id="googleScriptCode">
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const sheetId = data.sheetId;
+    const absensiData = data.absensiData;
+    
+    const sheet = SpreadsheetApp.openById(sheetId).getActiveSheet();
+    
+    // Clear existing data
+    sheet.clear();
+    
+    // Add headers
+    const headers = ['Tanggal', 'Nama Guru', 'Kedatangan', 'Status Datang', 'Pulang', 'Status Pulang', 'Keterangan'];
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    
+    // Add data
+    if (absensiData.length > 0) {
+      sheet.getRange(2, 1, absensiData.length, headers.length).setValues(absensiData);
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify({success: true, message: 'Data berhasil disinkronkan'}))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({success: false, message: error.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  return ContentService.createTextOutput(JSON.stringify({success: true, message: 'Script berjalan dengan baik'}))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+                </textarea>
+                <button onclick="copyScriptCode()" class="mt-2 bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm">
+                    📋 Copy Kode
+                </button>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button onclick="saveGoogleSheetsConfig()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg">
+                    💾 Simpan Konfigurasi
+                </button>
+                <button onclick="closeGoogleSheetsModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
+                    ❌ Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentSection = 'dashboard';
+        let selectedAbsensiType = '';
+        let selectedStatus = '';
+        let isAdminLoggedIn = false;
+        let currentAdminTab = 'guru';
+        
+        // Data storage
+        let guruData = JSON.parse(localStorage.getItem('guruData')) || [];
+        let absensiData = JSON.parse(localStorage.getItem('absensiData')) || [];
+        let sekolahSettings = JSON.parse(localStorage.getItem('sekolahSettings')) || {
+            nama: 'SMP NEGERI 3 LEMPUING JAYA',
+            alamat: 'Jln. Flamboyan, Desa Tania Makmur, Kec. Lempuing Jaya, OKI',
+            logo: null
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            loadGuruOptions();
+            updateDashboardStats();
+            loadSekolahSettings();
+            
+            // Set current month and year
+            const now = new Date();
+            document.getElementById('bulanSelect').value = now.getMonth();
+            document.getElementById('tahunSelect').value = now.getFullYear();
+        });
+
+        // Load school settings
+        function loadSekolahSettings() {
+            // Update all school name displays
+            document.getElementById('headerNamaSekolah').textContent = sekolahSettings.nama;
+            document.getElementById('dashboardNamaSekolah').textContent = sekolahSettings.nama;
+            document.getElementById('dashboardAlamatSekolah').textContent = sekolahSettings.alamat;
+            document.getElementById('rekapNamaSekolah').textContent = sekolahSettings.nama;
+            
+            // Update current info in admin panel
+            document.getElementById('currentNamaSekolah').textContent = sekolahSettings.nama;
+            document.getElementById('currentAlamatSekolah').textContent = sekolahSettings.alamat;
+            
+            // Update logo if exists
+            if (sekolahSettings.logo) {
+                updateLogoDisplay(sekolahSettings.logo);
+                document.getElementById('currentLogoStatus').textContent = 'Logo Custom (JPG)';
+            } else {
+                document.getElementById('currentLogoStatus').textContent = 'Logo Default (SVG)';
+            }
+        }
+
+        // Update logo display
+        function updateLogoDisplay(logoDataUrl) {
+            // Update header logo
+            document.getElementById('headerLogo').innerHTML = `<img src="${logoDataUrl}" alt="Logo Sekolah" class="w-12 h-12 rounded-full object-cover">`;
+            
+            // Update dashboard logo
+            document.getElementById('dashboardLogo').innerHTML = `<img src="${logoDataUrl}" alt="Logo Sekolah" class="w-32 h-32 rounded-full object-cover shadow-lg">`;
+            
+            // Update preview in admin
+            document.getElementById('logoPreviewContainer').innerHTML = `<img src="${logoDataUrl}" alt="Logo Sekolah" class="logo-preview rounded-full object-cover shadow-lg">`;
+        }
+
+        // Admin tab functions
+        function showAdminTab(tab) {
+            currentAdminTab = tab;
+            
+            // Update tab buttons
+            document.querySelectorAll('[id^="tab"]').forEach(btn => {
+                btn.classList.remove('border-blue-600', 'text-blue-600');
+                btn.classList.add('border-transparent', 'text-gray-600');
+            });
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('border-blue-600', 'text-blue-600');
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('border-transparent', 'text-gray-600');
+            
+            // Show/hide tab content
+            document.querySelectorAll('.admin-tab').forEach(tabContent => {
+                tabContent.classList.remove('active');
+            });
+            document.getElementById('admin' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active');
+            
+            // Load settings if school tab
+            if (tab === 'sekolah') {
+                loadSekolahSettingsForm();
+            }
+        }
+
+        // Load school settings form
+        function loadSekolahSettingsForm() {
+            document.getElementById('namaSekolahSetting').value = sekolahSettings.nama;
+            document.getElementById('alamatSekolahSetting').value = sekolahSettings.alamat;
+            
+            // Update preview
+            if (sekolahSettings.logo) {
+                document.getElementById('logoPreviewContainer').innerHTML = `<img src="${sekolahSettings.logo}" alt="Logo Sekolah" class="logo-preview rounded-full object-cover shadow-lg">`;
+            }
+        }
+
+        // Handle logo file upload
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoInput = document.getElementById('logoSekolahFile');
+            if (logoInput) {
+                logoInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // Validate file type
+                        if (!file.type.match('image/jpeg')) {
+                            alert('Hanya file JPG/JPEG yang diperbolehkan!');
+                            e.target.value = '';
+                            return;
+                        }
+                        
+                        // Validate file size (2MB max)
+                        if (file.size > 2 * 1024 * 1024) {
+                            alert('Ukuran file maksimal 2MB!');
+                            e.target.value = '';
+                            return;
+                        }
+                        
+                        // Preview the image
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            document.getElementById('logoPreviewContainer').innerHTML = `<img src="${e.target.result}" alt="Logo Preview" class="logo-preview rounded-full object-cover shadow-lg">`;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        });
+
+        // Save school settings
+        function saveSekolahSettings() {
+            const nama = document.getElementById('namaSekolahSetting').value.trim();
+            const alamat = document.getElementById('alamatSekolahSetting').value.trim();
+            const logoFile = document.getElementById('logoSekolahFile').files[0];
+            const messageDiv = document.getElementById('sekolahMessage');
+            
+            if (!nama || !alamat) {
+                showMessage(messageDiv, 'Nama sekolah dan alamat harus diisi!', 'error');
+                return;
+            }
+            
+            // Update settings
+            sekolahSettings.nama = nama;
+            sekolahSettings.alamat = alamat;
+            
+            // Handle logo upload
+            if (logoFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    sekolahSettings.logo = e.target.result;
+                    
+                    // Save to localStorage
+                    localStorage.setItem('sekolahSettings', JSON.stringify(sekolahSettings));
+                    
+                    // Update displays
+                    loadSekolahSettings();
+                    
+                    showMessage(messageDiv, 'Pengaturan sekolah berhasil disimpan!', 'success');
+                    
+                    // Clear file input
+                    document.getElementById('logoSekolahFile').value = '';
+                };
+                reader.readAsDataURL(logoFile);
+            } else {
+                // Save without logo change
+                localStorage.setItem('sekolahSettings', JSON.stringify(sekolahSettings));
+                loadSekolahSettings();
+                showMessage(messageDiv, 'Pengaturan sekolah berhasil disimpan!', 'success');
+            }
+        }
+
+        // Reset school settings
+        function resetSekolahSettings() {
+            if (confirm('Yakin ingin mengembalikan ke pengaturan default?')) {
+                sekolahSettings = {
+                    nama: 'SMP NEGERI 3 LEMPUING JAYA',
+                    alamat: 'Jln. Flamboyan, Desa Tania Makmur, Kec. Lempuing Jaya, OKI',
+                    logo: null
+                };
+                
+                localStorage.setItem('sekolahSettings', JSON.stringify(sekolahSettings));
+                loadSekolahSettings();
+                loadSekolahSettingsForm();
+                
+                // Reset logo preview to default
+                document.getElementById('logoPreviewContainer').innerHTML = `
+                    <svg class="w-24 h-24 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                    </svg>
+                `;
+                
+                // Reset header and dashboard logos to default
+                document.getElementById('headerLogo').innerHTML = `
+                    <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                    </svg>
+                `;
+                
+                document.getElementById('dashboardLogo').innerHTML = `
+                    <svg class="w-20 h-20 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                    </svg>
+                `;
+                
+                const messageDiv = document.getElementById('sekolahMessage');
+                showMessage(messageDiv, 'Pengaturan berhasil direset ke default!', 'success');
+            }
+        }
+
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZone: 'Asia/Jakarta'
+            };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('id-ID', options);
+        }
+
+        // Show section
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(section).classList.remove('hidden');
+            currentSection = section;
+            
+            if (section === 'rekap') {
+                loadRekap();
+            }
+        }
+
+        // Absensi functions
+        function selectAbsensiType(type) {
+            selectedAbsensiType = type;
+            document.querySelectorAll('#btnKedatangan, #btnPulang').forEach(btn => {
+                btn.classList.remove('border-blue-500', 'bg-blue-50');
+                btn.classList.add('border-gray-300');
+            });
+            document.getElementById(type === 'kedatangan' ? 'btnKedatangan' : 'btnPulang').classList.add('border-blue-500', 'bg-blue-50');
+        }
+
+        function selectStatus(status) {
+            selectedStatus = status;
+            document.querySelectorAll('#btnHadir, #btnIzin').forEach(btn => {
+                btn.classList.remove('border-green-500', 'bg-green-50', 'border-yellow-500', 'bg-yellow-50');
+                btn.classList.add('border-gray-300');
+            });
+            
+            if (status === 'hadir') {
+                document.getElementById('btnHadir').classList.add('border-green-500', 'bg-green-50');
+                document.getElementById('keteranganDiv').classList.add('hidden');
+            } else {
+                document.getElementById('btnIzin').classList.add('border-yellow-500', 'bg-yellow-50');
+                document.getElementById('keteranganDiv').classList.remove('hidden');
+            }
+        }
+
+        function submitAbsensi() {
+            const guruId = document.getElementById('guruSelect').value;
+            const keterangan = document.getElementById('keterangan').value;
+            const messageDiv = document.getElementById('absensiMessage');
+            
+            // Validation
+            if (!guruId) {
+                showMessage(messageDiv, 'Silakan pilih guru terlebih dahulu!', 'error');
+                return;
+            }
+            if (!selectedAbsensiType) {
+                showMessage(messageDiv, 'Silakan pilih jenis absensi (Kedatangan/Pulang)!', 'error');
+                return;
+            }
+            if (!selectedStatus) {
+                showMessage(messageDiv, 'Silakan pilih status kehadiran!', 'error');
+                return;
+            }
+            if (selectedStatus === 'izin' && !keterangan.trim()) {
+                showMessage(messageDiv, 'Silakan isi keterangan untuk izin!', 'error');
+                return;
+            }
+
+            // Save absensi
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            const time = now.toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta' });
+            
+            const guru = guruData.find(g => g.id === guruId);
+            const absensi = {
+                id: Date.now(),
+                guruId: guruId,
+                namaGuru: guru.nama,
+                tanggal: today,
+                type: selectedAbsensiType,
+                status: selectedStatus,
+                waktu: time,
+                keterangan: selectedStatus === 'izin' ? keterangan : ''
+            };
+
+            absensiData.push(absensi);
+            localStorage.setItem('absensiData', JSON.stringify(absensiData));
+            
+            showMessage(messageDiv, `Absensi ${selectedAbsensiType} berhasil disimpan! Waktu: ${time}`, 'success');
+            
+            // Reset form
+            resetAbsensiForm();
+            updateDashboardStats();
+        }
+
+        function resetAbsensiForm() {
+            document.getElementById('guruSelect').value = '';
+            selectedAbsensiType = '';
+            selectedStatus = '';
+            document.getElementById('keterangan').value = '';
+            document.getElementById('keteranganDiv').classList.add('hidden');
+            
+            document.querySelectorAll('#btnKedatangan, #btnPulang, #btnHadir, #btnIzin').forEach(btn => {
+                btn.classList.remove('border-blue-500', 'bg-blue-50', 'border-green-500', 'bg-green-50', 'border-yellow-500', 'bg-yellow-50');
+                btn.classList.add('border-gray-300');
+            });
+        }
+
+        // Load guru options
+        function loadGuruOptions() {
+            const select = document.getElementById('guruSelect');
+            const rekapSelect = document.getElementById('guruRekapSelect');
+            
+            select.innerHTML = '<option value="">-- Pilih Guru --</option>';
+            rekapSelect.innerHTML = '<option value="">Semua Guru</option>';
+            
+            guruData.forEach(guru => {
+                const option = document.createElement('option');
+                option.value = guru.id;
+                option.textContent = `${guru.nama} (${guru.nip})`;
+                select.appendChild(option);
+                
+                const rekapOption = document.createElement('option');
+                rekapOption.value = guru.id;
+                rekapOption.textContent = guru.nama;
+                rekapSelect.appendChild(rekapOption);
+            });
+        }
+
+        // Update dashboard stats
+        function updateDashboardStats() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayAbsensi = absensiData.filter(a => a.tanggal === today);
+            
+            // Count unique teachers who attended today (either kedatangan or pulang with status 'hadir')
+            const uniqueHadirGuru = new Set();
+            const uniqueIzinGuru = new Set();
+            
+            todayAbsensi.forEach(absen => {
+                if (absen.status === 'hadir') {
+                    uniqueHadirGuru.add(absen.guruId);
+                } else if (absen.status === 'izin') {
+                    uniqueIzinGuru.add(absen.guruId);
+                }
+            });
+            
+            document.getElementById('totalGuru').textContent = guruData.length;
+            document.getElementById('hadirHariIni').textContent = uniqueHadirGuru.size;
+            document.getElementById('izinHariIni').textContent = uniqueIzinGuru.size;
+        }
+
+        // Rekap functions
+        function loadRekap() {
+            const bulan = parseInt(document.getElementById('bulanSelect').value);
+            const tahun = parseInt(document.getElementById('tahunSelect').value);
+            const selectedGuru = document.getElementById('guruRekapSelect').value;
+            const sortBy = document.getElementById('sortSelect').value;
+            const tbody = document.getElementById('rekapTableBody');
+            
+            // Update header display
+            const bulanNama = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'][bulan];
+            document.getElementById('displayBulan').textContent = bulanNama;
+            document.getElementById('displayTahun').textContent = tahun;
+            
+            // Hide individual stats for general recap
+            document.getElementById('individualStats').classList.add('hidden');
+            
+            tbody.innerHTML = '';
+            
+            // Get days in month
+            const daysInMonth = new Date(tahun, bulan + 1, 0).getDate();
+            
+            // Collect all data first
+            const allData = [];
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(tahun, bulan, day);
+                const dateStr = date.toISOString().split('T')[0];
+                const dayAbsensi = absensiData.filter(a => a.tanggal === dateStr);
+                
+                if (dayAbsensi.length > 0) {
+                    // Group by guru for each day
+                    const guruGroups = {};
+                    dayAbsensi.forEach(absen => {
+                        // Filter by selected guru if specified
+                        if (selectedGuru && absen.guruId !== selectedGuru) return;
+                        
+                        if (!guruGroups[absen.guruId]) {
+                            guruGroups[absen.guruId] = {
+                                namaGuru: absen.namaGuru,
+                                tanggal: date,
+                                kedatangan: { waktu: '-', status: '-' },
+                                pulang: { waktu: '-', status: '-' },
+                                keterangan: ''
+                            };
+                        }
+                        
+                        if (absen.type === 'kedatangan') {
+                            guruGroups[absen.guruId].kedatangan = { waktu: absen.waktu, status: absen.status };
+                            if (absen.keterangan) guruGroups[absen.guruId].keterangan = absen.keterangan;
+                        } else if (absen.type === 'pulang') {
+                            guruGroups[absen.guruId].pulang = { waktu: absen.waktu, status: absen.status };
+                            if (absen.keterangan) guruGroups[absen.guruId].keterangan = absen.keterangan;
+                        }
+                    });
+                    
+                    // Add to all data
+                    Object.values(guruGroups).forEach(guru => {
+                        allData.push(guru);
+                    });
+                }
+            }
+            
+            // Sort data
+            sortRekapData(allData, sortBy);
+            
+            // Create rows
+            allData.forEach(guru => {
+                const row = document.createElement('tr');
+                const fullDate = guru.tanggal.toLocaleDateString('id-ID', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                row.innerHTML = `
+                    <td class="border border-gray-300 p-2">${fullDate}</td>
+                    <td class="border border-gray-300 p-2">${guru.namaGuru}</td>
+                    <td class="border border-gray-300 p-2">${guru.kedatangan.waktu}</td>
+                    <td class="border border-gray-300 p-2 text-center">${guru.kedatangan.status === 'hadir' ? '✅' : guru.kedatangan.status === 'izin' ? '📋' : '-'}</td>
+                    <td class="border border-gray-300 p-2">${guru.pulang.waktu}</td>
+                    <td class="border border-gray-300 p-2 text-center">${guru.pulang.status === 'hadir' ? '✅' : guru.pulang.status === 'izin' ? '📋' : '-'}</td>
+                    <td class="border border-gray-300 p-2">${guru.keterangan || '-'}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function loadIndividualRekap() {
+            const selectedGuru = document.getElementById('guruRekapSelect').value;
+            
+            if (!selectedGuru) {
+                alert('Silakan pilih guru terlebih dahulu untuk melihat rekap individu!');
+                return;
+            }
+            
+            const bulan = parseInt(document.getElementById('bulanSelect').value);
+            const tahun = parseInt(document.getElementById('tahunSelect').value);
+            const sortBy = document.getElementById('sortSelect').value;
+            const tbody = document.getElementById('rekapTableBody');
+            
+            // Update header display
+            const bulanNama = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'][bulan];
+            document.getElementById('displayBulan').textContent = bulanNama;
+            document.getElementById('displayTahun').textContent = tahun;
+            
+            // Show individual stats
+            const selectedGuruData = guruData.find(g => g.id === selectedGuru);
+            document.getElementById('selectedGuruName').textContent = selectedGuruData.nama;
+            document.getElementById('individualStats').classList.remove('hidden');
+            
+            tbody.innerHTML = '';
+            
+            // Get days in month
+            const daysInMonth = new Date(tahun, bulan + 1, 0).getDate();
+            
+            // Collect individual data and calculate stats
+            const individualData = [];
+            let totalHadir = 0;
+            let totalIzin = 0;
+            let totalTidakHadir = 0;
+            let totalHariKerja = 0;
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(tahun, bulan, day);
+                const dateStr = date.toISOString().split('T')[0];
+                
+                // Skip weekends (Saturday = 6, Sunday = 0)
+                if (date.getDay() === 0 || date.getDay() === 6) continue;
+                
+                totalHariKerja++;
+                
+                const dayAbsensi = absensiData.filter(a => a.tanggal === dateStr && a.guruId === selectedGuru);
+                
+                const guruData = {
+                    namaGuru: selectedGuruData.nama,
+                    tanggal: date,
+                    kedatangan: { waktu: '-', status: '-' },
+                    pulang: { waktu: '-', status: '-' },
+                    keterangan: ''
+                };
+                
+                let hasAttendance = false;
+                
+                dayAbsensi.forEach(absen => {
+                    hasAttendance = true;
+                    if (absen.type === 'kedatangan') {
+                        guruData.kedatangan = { waktu: absen.waktu, status: absen.status };
+                        if (absen.keterangan) guruData.keterangan = absen.keterangan;
+                    } else if (absen.type === 'pulang') {
+                        guruData.pulang = { waktu: absen.waktu, status: absen.status };
+                        if (absen.keterangan) guruData.keterangan = absen.keterangan;
+                    }
+                });
+                
+                // Calculate stats
+                if (hasAttendance) {
+                    if (guruData.kedatangan.status === 'hadir' || guruData.pulang.status === 'hadir') {
+                        totalHadir++;
+                    } else if (guruData.kedatangan.status === 'izin' || guruData.pulang.status === 'izin') {
+                        totalIzin++;
+                    }
+                } else {
+                    totalTidakHadir++;
+                }
+                
+                individualData.push(guruData);
+            }
+            
+            // Update stats display
+            document.getElementById('totalHadir').textContent = totalHadir;
+            document.getElementById('totalIzin').textContent = totalIzin;
+            document.getElementById('totalTidakHadir').textContent = totalTidakHadir;
+            
+            const persentase = totalHariKerja > 0 ? Math.round((totalHadir / totalHariKerja) * 100) : 0;
+            document.getElementById('persentaseKehadiran').textContent = persentase + '%';
+            
+            // Sort data
+            sortRekapData(individualData, sortBy);
+            
+            // Create rows
+            individualData.forEach(guru => {
+                const row = document.createElement('tr');
+                const fullDate = guru.tanggal.toLocaleDateString('id-ID', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                // Highlight rows based on status
+                let rowClass = '';
+                if (guru.kedatangan.status === 'hadir' || guru.pulang.status === 'hadir') {
+                    rowClass = 'bg-green-50';
+                } else if (guru.kedatangan.status === 'izin' || guru.pulang.status === 'izin') {
+                    rowClass = 'bg-yellow-50';
+                } else if (guru.kedatangan.status === '-' && guru.pulang.status === '-') {
+                    rowClass = 'bg-red-50';
+                }
+                
+                row.className = rowClass;
+                row.innerHTML = `
+                    <td class="border border-gray-300 p-2">${fullDate}</td>
+                    <td class="border border-gray-300 p-2">${guru.namaGuru}</td>
+                    <td class="border border-gray-300 p-2">${guru.kedatangan.waktu}</td>
+                    <td class="border border-gray-300 p-2 text-center">${guru.kedatangan.status === 'hadir' ? '✅' : guru.kedatangan.status === 'izin' ? '📋' : '-'}</td>
+                    <td class="border border-gray-300 p-2">${guru.pulang.waktu}</td>
+                    <td class="border border-gray-300 p-2 text-center">${guru.pulang.status === 'hadir' ? '✅' : guru.pulang.status === 'izin' ? '📋' : '-'}</td>
+                    <td class="border border-gray-300 p-2">${guru.keterangan || '-'}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function sortRekapData(data, sortBy) {
+            switch (sortBy) {
+                case 'tanggal-desc':
+                    data.sort((a, b) => b.tanggal - a.tanggal);
+                    break;
+                case 'tanggal-asc':
+                    data.sort((a, b) => a.tanggal - b.tanggal);
+                    break;
+                case 'nama-asc':
+                    data.sort((a, b) => a.namaGuru.localeCompare(b.namaGuru));
+                    break;
+                case 'nama-desc':
+                    data.sort((a, b) => b.namaGuru.localeCompare(a.namaGuru));
+                    break;
+                case 'status-hadir':
+                    data.sort((a, b) => {
+                        const aHadir = (a.kedatangan.status === 'hadir' || a.pulang.status === 'hadir') ? 1 : 0;
+                        const bHadir = (b.kedatangan.status === 'hadir' || b.pulang.status === 'hadir') ? 1 : 0;
+                        return bHadir - aHadir;
+                    });
+                    break;
+                case 'status-izin':
+                    data.sort((a, b) => {
+                        const aIzin = (a.kedatangan.status === 'izin' || a.pulang.status === 'izin') ? 1 : 0;
+                        const bIzin = (b.kedatangan.status === 'izin' || b.pulang.status === 'izin') ? 1 : 0;
+                        return bIzin - aIzin;
+                    });
+                    break;
+            }
+        }
+
+        function downloadExcel() {
+            const bulan = parseInt(document.getElementById('bulanSelect').value);
+            const tahun = parseInt(document.getElementById('tahunSelect').value);
+            const bulanNama = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'][bulan];
+            
+            const data = [];
+            const daysInMonth = new Date(tahun, bulan + 1, 0).getDate();
+            
+            // Header
+            data.push(['Tanggal', 'Nama Guru', 'Kedatangan', 'Status Datang', 'Pulang', 'Status Pulang', 'Keterangan']);
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(tahun, bulan, day);
+                const dateStr = date.toISOString().split('T')[0];
+                const dayAbsensi = absensiData.filter(a => a.tanggal === dateStr);
+                
+                if (dayAbsensi.length > 0) {
+                    // Group by guru for each day
+                    const guruGroups = {};
+                    dayAbsensi.forEach(absen => {
+                        if (!guruGroups[absen.guruId]) {
+                            guruGroups[absen.guruId] = {
+                                namaGuru: absen.namaGuru,
+                                kedatangan: { waktu: '-', status: '-' },
+                                pulang: { waktu: '-', status: '-' },
+                                keterangan: ''
+                            };
+                        }
+                        
+                        if (absen.type === 'kedatangan') {
+                            guruGroups[absen.guruId].kedatangan = { waktu: absen.waktu, status: absen.status };
+                            if (absen.keterangan) guruGroups[absen.guruId].keterangan = absen.keterangan;
+                        } else if (absen.type === 'pulang') {
+                            guruGroups[absen.guruId].pulang = { waktu: absen.waktu, status: absen.status };
+                            if (absen.keterangan) guruGroups[absen.guruId].keterangan = absen.keterangan;
+                        }
+                    });
+                    
+                    // Add rows for each guru
+                    Object.values(guruGroups).forEach(guru => {
+                        const fullDate = date.toLocaleDateString('id-ID', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                        
+                        data.push([
+                            fullDate,
+                            guru.namaGuru,
+                            guru.kedatangan.waktu,
+                            guru.kedatangan.status === 'hadir' ? '✅' : guru.kedatangan.status === 'izin' ? '📋' : '-',
+                            guru.pulang.waktu,
+                            guru.pulang.status === 'hadir' ? '✅' : guru.pulang.status === 'izin' ? '📋' : '-',
+                            guru.keterangan || '-'
+                        ]);
+                    });
+                }
+            }
+            
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Rekap Absensi');
+            XLSX.writeFile(wb, `Rekap_Absensi_${bulanNama}_${tahun}.xlsx`);
+        }
+
+        // Admin functions
+        function adminLogin() {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            const messageDiv = document.getElementById('loginMessage');
+            
+            // Demo credentials
+            if (username === 'admin' && password === 'admin123') {
+                isAdminLoggedIn = true;
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+                loadGuruTable();
+                showMessage(messageDiv, 'Login berhasil!', 'success');
+            } else {
+                showMessage(messageDiv, 'Username atau password salah!', 'error');
+            }
+        }
+
+        function adminLogout() {
+            isAdminLoggedIn = false;
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('adminUsername').value = '';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('loginMessage').classList.add('hidden');
+            
+            // Reset to guru tab
+            showAdminTab('guru');
+        }
+
+        function showAddGuruForm() {
+            document.getElementById('addGuruForm').classList.remove('hidden');
+        }
+
+        function cancelAddGuru() {
+            document.getElementById('addGuruForm').classList.add('hidden');
+            clearGuruForm();
+        }
+
+        function saveGuru() {
+            const nip = document.getElementById('nipGuru').value;
+            const nama = document.getElementById('namaGuru').value;
+            const email = document.getElementById('emailGuru').value;
+            const noHp = document.getElementById('noHpGuru').value;
+            const alamat = document.getElementById('alamatGuru').value;
+            const mataPelajaran = document.getElementById('mataPelajaran').value;
+            
+            if (!nip || !nama || !email || !noHp || !alamat || !mataPelajaran) {
+                alert('Semua field harus diisi!');
+                return;
+            }
+            
+            const guru = {
+                id: Date.now().toString(),
+                nip,
+                nama,
+                email,
+                noHp,
+                alamat,
+                mataPelajaran
+            };
+            
+            guruData.push(guru);
+            localStorage.setItem('guruData', JSON.stringify(guruData));
+            
+            loadGuruTable();
+            loadGuruOptions();
+            updateDashboardStats();
+            cancelAddGuru();
+            alert('Data guru berhasil disimpan!');
+        }
+
+        function clearGuruForm() {
+            document.getElementById('nipGuru').value = '';
+            document.getElementById('namaGuru').value = '';
+            document.getElementById('emailGuru').value = '';
+            document.getElementById('noHpGuru').value = '';
+            document.getElementById('alamatGuru').value = '';
+            document.getElementById('mataPelajaran').value = '';
+        }
+
+        function loadGuruTable() {
+            const tbody = document.getElementById('guruTableBody');
+            tbody.innerHTML = '';
+            
+            guruData.forEach(guru => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="border border-gray-300 p-2">${guru.nip}</td>
+                    <td class="border border-gray-300 p-2">${guru.nama}</td>
+                    <td class="border border-gray-300 p-2">${guru.email}</td>
+                    <td class="border border-gray-300 p-2">${guru.noHp}</td>
+                    <td class="border border-gray-300 p-2">${guru.mataPelajaran}</td>
+                    <td class="border border-gray-300 p-2">
+                        <button onclick="deleteGuru('${guru.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
+                            🗑️ Hapus
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function deleteGuru(id) {
+            if (confirm('Yakin ingin menghapus data guru ini?')) {
+                guruData = guruData.filter(g => g.id !== id);
+                localStorage.setItem('guruData', JSON.stringify(guruData));
+                loadGuruTable();
+                loadGuruOptions();
+                updateDashboardStats();
+            }
+        }
+
+        // Utility function
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = `mt-6 text-center p-3 rounded-lg ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
+            element.classList.remove('hidden');
+            
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Google Sheets Integration Functions
+        function showGoogleSheetsModal() {
+            // Load saved configuration
+            const savedConfig = JSON.parse(localStorage.getItem('googleSheetsConfig')) || {};
+            if (savedConfig.scriptUrl) {
+                document.getElementById('googleScriptUrl').value = savedConfig.scriptUrl;
+            }
+            if (savedConfig.sheetId) {
+                document.getElementById('googleSheetId').value = savedConfig.sheetId;
+            }
+            
+            document.getElementById('googleSheetsModal').classList.remove('hidden');
+        }
+
+        function closeGoogleSheetsModal() {
+            document.getElementById('googleSheetsModal').classList.add('hidden');
+        }
+
+        function copyScriptCode() {
+            const codeTextarea = document.getElementById('googleScriptCode');
+            codeTextarea.select();
+            document.execCommand('copy');
+            
+            const statusDiv = document.getElementById('googleSheetsStatus');
+            showGoogleSheetsMessage(statusDiv, 'Kode berhasil dicopy ke clipboard!', 'success');
+        }
+
+        function saveGoogleSheetsConfig() {
+            const scriptUrl = document.getElementById('googleScriptUrl').value;
+            const sheetId = document.getElementById('googleSheetId').value;
+            
+            if (!scriptUrl || !sheetId) {
+                const statusDiv = document.getElementById('googleSheetsStatus');
+                showGoogleSheetsMessage(statusDiv, 'Harap isi semua field!', 'error');
+                return;
+            }
+            
+            const config = { scriptUrl, sheetId };
+            localStorage.setItem('googleSheetsConfig', JSON.stringify(config));
+            
+            const statusDiv = document.getElementById('googleSheetsStatus');
+            showGoogleSheetsMessage(statusDiv, 'Konfigurasi berhasil disimpan!', 'success');
+        }
+
+        function testGoogleSheetsConnection() {
+            const scriptUrl = document.getElementById('googleScriptUrl').value;
+            const statusDiv = document.getElementById('googleSheetsStatus');
+            
+            if (!scriptUrl) {
+                showGoogleSheetsMessage(statusDiv, 'Harap isi URL Google Apps Script!', 'error');
+                return;
+            }
+            
+            showGoogleSheetsMessage(statusDiv, 'Menguji koneksi...', 'info');
+            
+            fetch(scriptUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showGoogleSheetsMessage(statusDiv, 'Koneksi berhasil! ✅', 'success');
+                    } else {
+                        showGoogleSheetsMessage(statusDiv, 'Koneksi gagal: ' + data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    showGoogleSheetsMessage(statusDiv, 'Error: ' + error.message, 'error');
+                });
+        }
+
+        function syncToGoogleSheets() {
+            const scriptUrl = document.getElementById('googleScriptUrl').value;
+            const sheetId = document.getElementById('googleSheetId').value;
+            const statusDiv = document.getElementById('googleSheetsStatus');
+            
+            if (!scriptUrl || !sheetId) {
+                showGoogleSheetsMessage(statusDiv, 'Harap isi semua field!', 'error');
+                return;
+            }
+            
+            // Prepare data for current month
+            const bulan = parseInt(document.getElementById('bulanSelect').value);
+            const tahun = parseInt(document.getElementById('tahunSelect').value);
+            const daysInMonth = new Date(tahun, bulan + 1, 0).getDate();
+            
+            const syncData = [];
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(tahun, bulan, day);
+                const dateStr = date.toISOString().split('T')[0];
+                const dayAbsensi = absensiData.filter(a => a.tanggal === dateStr);
+                
+                if (dayAbsensi.length > 0) {
+                    const guruGroups = {};
+                    dayAbsensi.forEach(absen => {
+                        if (!guruGroups[absen.guruId]) {
+                            guruGroups[absen.guruId] = {
+                                namaGuru: absen.namaGuru,
+                                kedatangan: { waktu: '-', status: '-' },
+                                pulang: { waktu: '-', status: '-' },
+                                keterangan: ''
+                            };
+                        }
+                        
+                        if (absen.type === 'kedatangan') {
+                            guruGroups[absen.guruId].kedatangan = { waktu: absen.waktu, status: absen.status };
+                            if (absen.keterangan) guruGroups[absen.guruId].keterangan = absen.keterangan;
+                        } else if (absen.type === 'pulang') {
+                            guruGroups[absen.guruId].pulang = { waktu: absen.waktu, status: absen.status };
+                            if (absen.keterangan) guruGroups[absen.guruId].keterangan = absen.keterangan;
+                        }
+                    });
+                    
+                    Object.values(guruGroups).forEach(guru => {
+                        const fullDate = date.toLocaleDateString('id-ID', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                        
+                        syncData.push([
+                            fullDate,
+                            guru.namaGuru,
+                            guru.kedatangan.waktu,
+                            guru.kedatangan.status === 'hadir' ? 'Hadir' : guru.kedatangan.status === 'izin' ? 'Izin' : '-',
+                            guru.pulang.waktu,
+                            guru.pulang.status === 'hadir' ? 'Hadir' : guru.pulang.status === 'izin' ? 'Izin' : '-',
+                            guru.keterangan || '-'
+                        ]);
+                    });
+                }
+            }
+            
+            showGoogleSheetsMessage(statusDiv, 'Mengirim data ke Google Sheets...', 'info');
+            
+            const payload = {
+                sheetId: sheetId,
+                absensiData: syncData
+            };
+            
+            fetch(scriptUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showGoogleSheetsMessage(statusDiv, 'Data berhasil disinkronkan ke Google Sheets! ✅', 'success');
+                    // Save configuration after successful sync
+                    saveGoogleSheetsConfig();
+                } else {
+                    showGoogleSheetsMessage(statusDiv, 'Sync gagal: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                showGoogleSheetsMessage(statusDiv, 'Error: ' + error.message, 'error');
+            });
+        }
+
+        function showGoogleSheetsMessage(element, message, type) {
+            element.textContent = message;
+            element.className = `mb-4 p-3 rounded-lg ${
+                type === 'success' ? 'bg-green-100 text-green-800' : 
+                type === 'error' ? 'bg-red-100 text-red-800' : 
+                'bg-blue-100 text-blue-800'
+            }`;
+            element.classList.remove('hidden');
+            
+            if (type !== 'info') {
+                setTimeout(() => {
+                    element.classList.add('hidden');
+                }, 5000);
+            }
+        }
+
+        // Add some sample data for demo
+        if (guruData.length === 0) {
+            guruData = [
+                {
+                    id: '1',
+                    nip: '196801011990031001',
+                    nama: 'Dra. Siti Aminah',
+                    email: 'siti.aminah@smpn3lempuingjaya.sch.id',
+                    noHp: '081234567890',
+                    alamat: 'Jl. Melati No. 15, Lempuing Jaya',
+                    mataPelajaran: 'Bahasa Indonesia'
+                },
+                {
+                    id: '2',
+                    nip: '197205151998022001',
+                    nama: 'Ahmad Fauzi, S.Pd',
+                    email: 'ahmad.fauzi@smpn3lempuingjaya.sch.id',
+                    noHp: '081234567891',
+                    alamat: 'Jl. Mawar No. 8, Tania Makmur',
+                    mataPelajaran: 'Matematika'
+                }
+            ];
+            localStorage.setItem('guruData', JSON.stringify(guruData));
+            loadGuruOptions();
+            updateDashboardStats();
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'978f29c6b208ea7b',t:'MTc1NjgzODcxMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
